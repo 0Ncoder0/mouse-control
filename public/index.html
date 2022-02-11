@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -7,10 +7,12 @@
     <title>Document</title>
 
     <style>
+      body {
+        font-size: 10vw;
+      }
       #touch-pad {
         height: 100vw;
         width: 90vw;
-        margin-top: 20vw;
         margin-left: auto;
         margin-right: auto;
         border: 2px dashed gray;
@@ -24,9 +26,23 @@
         -ms-user-select: none;
         user-select: none;
       }
+      #input-string {
+        width: 50vw;
+        height: 10vw;
+      }
     </style>
   </head>
   <body>
+    <div style="height: 5vw"></div>
+    <div style="display: flex; align-items: center; justify-content: center">
+      <div id="switch-touch-pad">鼠标</div>
+      <div style="width: 10vw"></div>
+      <div id="switch-keyboard">键盘</div>
+    </div>
+    <div style="height: 5vw"></div>
+    <!-- 键盘 -->
+    <div id="keyboard"></div>
+    <!-- 鼠标 -->
     <div id="touch-pad"></div>
   </body>
   <script src="./socket.io.js"></script>

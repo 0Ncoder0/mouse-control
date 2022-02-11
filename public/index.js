@@ -2,54 +2,18 @@ const socket = io('http://192.168.1.174:3001')
 
 socket.on('connect', () => {
   addMouseTouchPadListener(socket)
+  addKeyboardListener(socket)
+  addSwitchListener()
 })
 
-/** 监听鼠标遥控点击按钮事件 */
-const addMouseClickButtonsListener = onEmit => {
-  document.getElementById('中').addEventListener('click', () => onEmit('mouse-left-click'))
-}
-/** 监听鼠标遥控移动按钮事件 */
-const addMouseMoveButtonsListener = onEmit => {
-  /** 增量/毫秒 */
-  const speed = 1
-  const delta = { dx: 0, dy: 0 }
-  setInterval(() => {
-    if (delta.dx === 0 && delta.dy === 0) return
-
-    onEmit({ ...delta })
-
-    delta.dx = 0
-    delta.dy = 0
-  }, 1000 / 60)
-
-  const list = [
-    { id: '上', timer: null, delta: { dx: 0, dy: -speed } },
-    { id: '下', timer: null, delta: { dx: 0, dy: +speed } },
-    { id: '左', timer: null, delta: { dx: -speed, dy: 0 } },
-    { id: '右', timer: null, delta: { dx: +speed, dy: 0 } }
-  ]
-
-  list.forEach(item => {
-    document.getElementById(item.id).addEventListener('touchstart', () => {
-      item.timer = setInterval(() => {
-        delta.dx += item.delta.dx * 10
-        delta.dy += item.delta.dy * 10
-      }, 10)
-    })
-    document.getElementById(item.id).addEventListener('touchend', () => {
-      clearInterval(item.timer)
-    })
-  })
+const stopEvent = event => {
+  event.stopImmediatePropagation()
+  event.stopPropagation()
+  event.preventDefault()
 }
 
 /** 触控板监听 */
 const addMouseTouchPadListener = socket => {
-  const stopEvent = event => {
-    event.stopImmediatePropagation()
-    event.stopPropagation()
-    event.preventDefault()
-  }
-
   const touchPad = document.getElementById('touch-pad')
 
   const start = { x: 0, y: 0 }
@@ -101,4 +65,81 @@ const addMouseTouchPadListener = socket => {
 
     if (delta.dx !== 0 || delta.dy !== 0) socket.emit('mouse-move', delta)
   }, 10)
+}
+
+/** 键盘监听 */
+const addKeyboardListener = socket => {
+  const keyboard = document.getElementById('keyboard')
+
+  const keys = ['123456789', 'qwertyuiop', 'asdfghjkl', 'zxcvbnm'].map(ele => ele.split(''))
+  const specialKeys = [
+    { key: 'shift', value: 'shift' },
+    { key: 'space', value: 'space' },
+    { key: 'backspace', value: 'backspace' },
+    { key: 'enter', value: 'enter' }
+  ]
+
+  const createRowDiv = () => {
+    const div = document.createElement('div')
+    div.style.display = 'flex'
+    div.style.alignItems = 'center'
+    div.style.justifyContent = 'center'
+    return div
+  }
+  const createKeyDiv = key => {
+    const div = document.createElement('div')
+    div.style.display = 'flex'
+    div.style.alignItems = 'center'
+    div.style.justifyContent = 'center'
+    div.style.fontSize = '6vw'
+    div.style.padding = '1vw 2vw'
+    div.style.margin = '0.5vw'
+    div.style.minWidth = '8vw'
+    div.style.border = '1px solid #DCDFE6'
+    div.style.borderRadius = '5px'
+    div.style.boxSizing = 'border-box'
+    div.innerText = key
+    div.addEventListener('click', () => socket.emit('key-tap', key))
+    return div
+  }
+  {
+    keys.forEach(row => {
+      const rowDiv = createRowDiv()
+      keyboard.appendChild(rowDiv)
+      row.forEach(key => rowDiv.appendChild(createKeyDiv(key)))
+    })
+  }
+
+  {
+    const rowDiv = createRowDiv()
+    specialKeys.forEach(item => rowDiv.appendChild(createKeyDiv(item.key)))
+    keyboard.appendChild(rowDiv)
+  }
+}
+
+/** 监听切换 */
+const addSwitchListener = () => {
+  const switchKeyboard = document.getElementById('switch-keyboard')
+  const switchTouchPad = document.getElementById('switch-touch-pad')
+
+  const touchPad = document.getElementById('touch-pad')
+  const keyboard = document.getElementById('keyboard')
+
+  switchKeyboard.addEventListener('click', () => {
+    switchKeyboard.style.color = '#409EFF'
+    switchTouchPad.style.color = '#909399'
+
+    keyboard.style.display = 'block'
+    touchPad.style.display = 'none'
+  })
+
+  switchTouchPad.addEventListener('click', () => {
+    switchTouchPad.style.color = '#409EFF'
+    switchKeyboard.style.color = '#909399'
+
+    touchPad.style.display = 'block'
+    keyboard.style.display = 'none'
+  })
+
+  switchTouchPad.click()
 }

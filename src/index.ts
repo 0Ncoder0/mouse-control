@@ -45,6 +45,11 @@ const addSocketListener = () => {
       console.info(`move mouse to x:${pos.x} y:${pos.y}`)
       isToggle ? robot.dragMouse(pos.x, pos.y) : robot.moveMouse(pos.x, pos.y)
     })
+
+    socket.on('key-tap', data => {
+      robot.keyTap(data)
+      console.info(`key tap : ${data}`)
+    })
   })
 }
 
