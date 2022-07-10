@@ -1,0 +1,1 @@
+window.socketIp="http://192.168.125.3:3001"

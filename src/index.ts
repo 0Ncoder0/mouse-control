@@ -3,6 +3,8 @@ import { createServer } from 'http'
 import robot from 'robotjs'
 import express from 'express'
 import os from 'os'
+import fs from 'fs'
+import path from 'path'
 
 const addSocketListener = () => {
   const port = 3001
@@ -47,7 +49,11 @@ const addSocketListener = () => {
     })
 
     socket.on('key-tap', data => {
-      robot.keyTap(data)
+      try {
+        robot.keyTap(data)
+      } catch (error) {
+        console.error(error)
+      }
       console.info(`key tap : ${data}`)
     })
   })
@@ -75,5 +81,10 @@ const getIp = () => {
   }
 }
 
+const createSocketIpFile = () => {
+  fs.writeFileSync(path.join(__dirname, '../public/socket-ip.js',), `window.socketIp="http://${getIp()}:3001"`)
+}
+
+createSocketIpFile()
 addSocketListener()
 addHttpListener()
