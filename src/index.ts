@@ -74,7 +74,7 @@ const getIp = () => {
   for (const key of Object.keys(obj)) {
     const list = obj[key] || []
     for (const item of list) {
-      if (item.family === 'IPv4' && item.internal === false) {
+      if (item.family === 'IPv4' && item.address.match('192.168.') && item.internal === false) {
         return item.address
       }
     }
